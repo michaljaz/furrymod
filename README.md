@@ -1,0 +1,2 @@
+# furrymod
+Moomoo.io cheat
