@@ -37,11 +37,13 @@ function init () {
     onmessage(msgpack.decode(new Uint8Array(m.data)))
     onmessage_backup(m)
   }
+  startCheat()
 }
 function intercept (data) {
-  if (data[0] != 2 && data[0] != '2' && data[0] != 'pp') {
-  	// console.log(...data)
-  }
+  // if (data[0] != 2 && data[0] != '2' && data[0] != 'pp') {
+  //
+  // }
+  console.log(...data)
   if (data[0] == 'c') {
     if (data[1][0] == 1) {
       send('13c', [0, 42, 0])
@@ -53,6 +55,8 @@ function intercept (data) {
 
 let tribes = {}
 let players = {}
+let entities = []
+let player = false
 
 function onmessage (data) {
   if (data[0] == 'a') {
@@ -81,13 +85,72 @@ function onmessage (data) {
       players[p[0][i]] = {name: p[1][i], gold: p[2][i]}
     }
     // console.log(players)
-  } else if (data[0] == '33') {
-    const entities=[]
-    for(var i=0;i<data[1][0].length/13;i++){
-      entities.push(data[1][0].slice(13*i,13*i+13))
+  } else if (data[0] == '2') {
+    if (!player) {
+      player = data[1][0]
     }
-    console.log(data[1][0],entities)
-  } else{
+  } else if (data[0] == '33') {
+    entities = []
+    for (var i = 0; i < data[1][0].length / 13; i++) {
+      entities.push(data[1][0].slice(13 * i, 13 * i + 13))
+    }
+    // console.log(entities,player)
+  } else {
     // console.log(data)
   }
 }
+
+function startCheat () {
+  // setInterval(() => {
+  //   moveToNearestPlayer()
+  // }, 100)
+}
+
+function moveToNearestPlayer () {
+  let playerEntity=false
+  for (var i = 0; i < entities.length; i++) {
+    if (entities[i][0] == player[1]) {
+      playerEntity = entities[i]
+      break
+    }
+  }
+  if(playerEntity){
+    let dist = 9999999
+    let nent = false
+    for (var i = 0; i < entities.length; i++) {
+      if (entities[i][0] != player[1]) {
+        let a = Math.abs(entities[i][1] - playerEntity[1])
+        let b = Math.abs(entities[i][2] - playerEntity[2])
+        let d = Math.sqrt(a * a + b * b)
+        if (d < dist) {
+          nent = entities[i]
+          dist = d
+        }
+      }
+    }
+    let a = nent[1] - playerEntity[1]
+    let b = nent[2] - playerEntity[2]
+
+    //--
+    //-+
+
+    if((a<0 && b<0) || (a<0 && b>0)){
+      send(33,[Math.atan(b/a)-Math.PI])
+      send(2,[Math.atan(b/a)-Math.PI])
+    }else{
+      send(33,[Math.atan(b/a)])
+      send(2,[Math.atan(b/a)])
+    }
+    console.log(a,b)
+  }else{
+    console.log('player not found')
+  }
+
+}
+
+document.addEventListener('keydown',(e)=>{
+  if(e.code=="KeyP"){
+    send('c',[1,null])
+    moveToNearestPlayer()
+  }
+})
