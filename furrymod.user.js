@@ -2,7 +2,7 @@
 // @name        FurryMod
 // @namespace   furrymod
 // @description Moomoo.io cheat
-// @include     https://moomoo.io/*
+// @include     *://moomoo.io/*
 // @version     1
 // @run-at      document-start
 // @require     https://cdnjs.cloudflare.com/ajax/libs/msgpack-lite/0.1.26/msgpack.min.js
@@ -30,6 +30,7 @@ WebSocket.prototype.send = function (data) {
 }
 
 function init () {
+	document.querySelector("#ot-sdk-btn-floating").remove()
   console.log('Furrymod READY!')
   onmessage_backup = this_backup.onmessage
   this_backup.onmessage = (m) => {
@@ -38,6 +39,7 @@ function init () {
   }
 }
 function intercept (data) {
+
   if (data[0] != 2 && data[0] != '2' && data[0] != 'pp') {
   	console.log(...data)
   }
@@ -50,5 +52,7 @@ function intercept (data) {
   }
 }
 function onmessage (data) {
-  console.log(data)
+	if(data[0]!='a'){
+		console.log(data)
+	}
 }
