@@ -40,7 +40,7 @@ function init () {
 }
 function intercept (data) {
   if (data[0] != 2 && data[0] != '2' && data[0] != 'pp') {
-  	console.log(...data)
+  	// console.log(...data)
   }
   if (data[0] == 'c') {
     if (data[1][0] == 1) {
@@ -55,24 +55,23 @@ let tribes = {}
 let players = {}
 
 function onmessage (data) {
-  if (data[0] == 'ac') {
+  if (data[0] == 'a') {
+    // nothing
+  } else if (data[0] == 'ac') {
     console.log('TRIBE_CREATED', tribes)
     const {sid, owner} = data[1][0]
     tribes[sid] = owner
-  }
-  if (data[0] == 'ad') {
+  } else if (data[0] == 'ad') {
     console.log('TRIBE_DELETED', tribes)
     delete tribes[data[1][0]]
-  }
-  if (data[0] == 'id') {
+  } else if (data[0] == 'id') {
     console.log('TRIBE_INIT', tribes)
     const {teams} = data[1][0]
     for (var i = 0; i < teams.length; i++) {
       const {sid, owner} = teams[i]
       tribes[sid] = owner
     }
-  }
-  if (data[0] == '5') {
+  } else if (data[0] == '5') {
     let p = {0: [], 1: [], 2: []}
     // console.log()
     for (var i = 0; i < data[1][0].length; i++) {
@@ -81,9 +80,14 @@ function onmessage (data) {
     for (var i = 0; i < p[0].length; i++) {
       players[p[0][i]] = {name: p[1][i], gold: p[2][i]}
     }
-    console.log(players)
-  }
-  if (data[0] != 'a' && data[0] != 'ac' && data[0] != 'ad') {
-		// console.log(data)
+    // console.log(players)
+  } else if (data[0] == '33') {
+    const entities=[]
+    for(var i=0;i<data[1][0].length/13;i++){
+      entities.push(data[1][0].slice(13*i,13*i+13))
+    }
+    console.log(data[1][0],entities)
+  } else{
+    // console.log(data)
   }
 }
