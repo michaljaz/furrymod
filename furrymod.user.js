@@ -8,8 +8,6 @@
 // @require     https://cdnjs.cloudflare.com/ajax/libs/msgpack-lite/0.1.26/msgpack.min.js
 // ==/UserScript==
 
-// const en = new Uint8Array(Array.from(msgpack.encode('123')))
-// console.log(en))
 
 let this_backup = null, onmessage_backup
 
@@ -37,13 +35,11 @@ function init () {
     onmessage(msgpack.decode(new Uint8Array(m.data)))
     onmessage_backup(m)
   }
-  startCheat()
 }
 function intercept (data) {
-  // if (data[0] != 2 && data[0] != '2' && data[0] != 'pp') {
-  //
-  // }
-  console.log(...data)
+  if (data[0] != 2 && data[0] != '2' && data[0] != 'pp') {
+    // console.log(...data)
+  }
   if (data[0] == 'c') {
     if (data[1][0] == 1) {
       send('13c', [0, 42, 0])
@@ -86,39 +82,54 @@ function onmessage (data) {
     }
     // console.log(players)
   } else if (data[0] == '2') {
-    if (!player) {
+    if (!player && data[1][0][2]==="MJQX") {
       player = data[1][0]
+      console.log('PLAYER', player)
     }
   } else if (data[0] == '33') {
     entities = []
     for (var i = 0; i < data[1][0].length / 13; i++) {
       entities.push(data[1][0].slice(13 * i, 13 * i + 13))
     }
-    // console.log(entities,player)
+    // console.log(entities, player)
   } else {
     // console.log(data)
   }
 }
 
-function startCheat () {
-  // setInterval(() => {
-  //   moveToNearestPlayer()
-  // }, 100)
+let int
+
+function startEscaper () {
+  clearInterval(int)
+  int = setInterval(() => {
+    moveToNearestPlayer(false)
+  }, 100)
 }
 
-function moveToNearestPlayer () {
-  let playerEntity=false
+function startKiller () {
+  clearInterval(int)
+  int = setInterval(() => {
+    moveToNearestPlayer(true)
+  }, 100)
+}
+
+function stop () {
+  clearInterval(int)
+}
+
+function moveToNearestPlayer (killer) {
+  let playerEntity = false
   for (var i = 0; i < entities.length; i++) {
-    if (entities[i][0] == player[1]) {
+    if (entities[i][0] === player[1]) {
       playerEntity = entities[i]
       break
     }
   }
-  if(playerEntity){
+  if (playerEntity) {
     let dist = 9999999
     let nent = false
     for (var i = 0; i < entities.length; i++) {
-      if (entities[i][0] != player[1]) {
+      if (entities[i][0] !== player[1]) {
         let a = Math.abs(entities[i][1] - playerEntity[1])
         let b = Math.abs(entities[i][2] - playerEntity[2])
         let d = Math.sqrt(a * a + b * b)
@@ -131,26 +142,49 @@ function moveToNearestPlayer () {
     let a = nent[1] - playerEntity[1]
     let b = nent[2] - playerEntity[2]
 
-    //--
-    //-+
+    // --
+    // -+
 
-    if((a<0 && b<0) || (a<0 && b>0)){
-      send(33,[Math.atan(b/a)-Math.PI])
-      send(2,[Math.atan(b/a)-Math.PI])
+    if(killer){
+      if ((a < 0 && b < 0) || (a < 0 && b > 0)) {
+        send(33, [Math.atan(b / a) - Math.PI])
+        send(2, [Math.atan(b / a) - Math.PI])
+      } else {
+        send(33, [Math.atan(b / a)])
+        send(2, [Math.atan(b / a)])
+      }
     }else{
-      send(33,[Math.atan(b/a)])
-      send(2,[Math.atan(b/a)])
+      if ((a < 0 && b < 0) || (a < 0 && b > 0)) {
+        send(33, [Math.atan(b / a)])
+        send(2, [Math.atan(b / a) - Math.PI])
+      } else {
+        send(33, [Math.atan(b / a) - Math.PI])
+        send(2, [Math.atan(b / a)])
+      }
     }
-    console.log(a,b)
-  }else{
+
+
+  } else {
     console.log('player not found')
   }
-
 }
 
-document.addEventListener('keydown',(e)=>{
-  if(e.code=="KeyP"){
-    send('c',[1,null])
-    moveToNearestPlayer()
+document.addEventListener('keydown', (e) => {
+  if (e.code == 'KeyP') {
+    send('c', [1, null])
+    startKiller()
+  }
+})
+document.addEventListener('keyup', (e) => {
+  if (e.code == 'KeyL') {
+    send('c', [1, null])
+    startEscaper()
+  }
+})
+
+document.addEventListener('keyup', (e) => {
+  if (e.code == 'KeyO') {
+    send('c', [0, null])
+    stop()
   }
 })
