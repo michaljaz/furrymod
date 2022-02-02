@@ -38,13 +38,13 @@ function init () {
 }
 function intercept (data) {
   if (data[0] != 2 && data[0] != '2' && data[0] != 'pp') {
-    // console.log(...data)
+    console.log(...data)
   }
   if (data[0] == 'c') {
     if (data[1][0] == 1) {
-      send('13c', [0, 42, 0])
+      send('13c', [0, 0, 1])
     } else {
-      send('13c', [0, 0, 0])
+      send('13c', [0, 11, 1])
     }
   }
 }
@@ -148,18 +148,18 @@ function moveToNearestPlayer (killer) {
     if(killer){
       if ((a < 0 && b < 0) || (a < 0 && b > 0)) {
         send(33, [Math.atan(b / a) - Math.PI])
-        send(2, [Math.atan(b / a) - Math.PI])
+        // send(2, [Math.atan(b / a) - Math.PI])
       } else {
         send(33, [Math.atan(b / a)])
-        send(2, [Math.atan(b / a)])
+        // send(2, [Math.atan(b / a)])
       }
     }else{
       if ((a < 0 && b < 0) || (a < 0 && b > 0)) {
         send(33, [Math.atan(b / a)])
-        send(2, [Math.atan(b / a) - Math.PI])
+        // send(2, [Math.atan(b / a) - Math.PI])
       } else {
         send(33, [Math.atan(b / a) - Math.PI])
-        send(2, [Math.atan(b / a)])
+        // send(2, [Math.atan(b / a)])
       }
     }
 
@@ -171,20 +171,20 @@ function moveToNearestPlayer (killer) {
 
 document.addEventListener('keydown', (e) => {
   if (e.code == 'KeyP') {
-    send('c', [1, null])
+    // send('c', [1, null])
     startKiller()
   }
 })
 document.addEventListener('keyup', (e) => {
   if (e.code == 'KeyL') {
-    send('c', [1, null])
+    // send('c', [1, null])
     startEscaper()
   }
 })
 
 document.addEventListener('keyup', (e) => {
   if (e.code == 'KeyO') {
-    send('c', [0, null])
+    // send('c', [0, null])
     stop()
   }
 })
